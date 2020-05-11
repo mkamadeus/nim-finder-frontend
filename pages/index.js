@@ -16,39 +16,6 @@ export default class IndexPage extends React.Component {
       response: []
     }
   }
-  
-  componentDidMount()
-  {
-    const script = document.createElement("script");
-    script.src = "https://apis.google.com/js/client.js";
-    script.async = true;
-    script.defer = true;
-
-    script.onload = () => {
-      gapi.load('client:auth2', () => {
-        gapi.client.setApiKey(null)
-        gapi.client.init({
-          clientId: '922354667314-87s0oulmd0incnhekssf7h5fr9ucdo4u.apps.googleusercontent.com',
-          apiKey: 'AIzaSyAdizAVRKgDYvSTVvFAm02jJcNPLmdNPFQ',
-          discoveryDocs: 'https://sheets.googleapis.com/$discovery/rest?version=v4',
-          scopes: 'https://www.googleapis.com/auth/spreadsheets.readonly'
-        }).then(function () {
-          // Listen for sign-in state changes.
-          gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-
-          // Handle the initial sign-in state.
-          // updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-          // authorizeButton.onclick = handleAuthClick;
-          // signoutButton.onclick = handleSignoutClick;
-        }, function(error) {
-          // appendPre(JSON.stringify(error, null, 2));
-        });
-        this.setState({ gapiReady: true });
-      });
-    };
-
-    document.body.appendChild(script);
-  }
 
   render()
   {
@@ -69,7 +36,6 @@ export default class IndexPage extends React.Component {
           </div>
           <div className="flex w-full my-3">
             <input type="text" placeholder="Masukkan kata pencarian..." className="rounded-full bg-gray-200 w-full p-2 px-4 border-2 border-transparent text-blue-800 font-semibold focus:text-black focus:border-solid focus:bg-white focus:border-blue-300 focus:shadow md:focus:shadow-md lg:focus:shadow-lg transition duration-300 ease-out" onInput={this.queryHandler.bind(this)}/>
-            {this.state.gapiReady?<button onClick={()=>gapi.auth2.getAuthInstance().signIn()}>help</button>:null}
           </div>
           <div>
             {
