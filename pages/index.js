@@ -87,11 +87,9 @@ export default class IndexPage extends React.Component {
 
   async queryHandler(e) {
     await this.setState({query: e.target.value})
-    console.log(this.state.query)
-    console.log(this.state.query.length)
     if(this.state.query.length > 2)
     {
-      const response = await axios.get('http://localhost:3000/api/nimfinder?keyword=' + this.state.query)
+      const response = await axios.get('https://api.gatot.id/nimfinder?keyword=' + this.state.query)
       this.setState({response : response.data})
     }
     else

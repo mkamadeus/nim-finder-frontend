@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import HeadComponent from '../../components/HeadComponent';
+import HeadComponent from '../components/HeadComponent';
 
 export default class HelpPage extends React.Component {
   render()
