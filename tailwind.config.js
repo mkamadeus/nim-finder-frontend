@@ -5,6 +5,8 @@ module.exports = {
      'sans': ['Nunito', 'sans-serif'],
     }
   },
-  variants: {},
+  variants: {
+    boxShadow: ['responsive', 'hover', 'focus', 'active', 'group-hover']
+  },
   plugins: [],
 }
