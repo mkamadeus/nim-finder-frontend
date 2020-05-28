@@ -131,10 +131,10 @@ export default class IndexPage extends React.Component {
                 ]}
                 sortResponse={this.onSortByClicked.bind(this)}
                 sortedBy={[
-                  'Sorted Alphabetically Ascending',
-                  'Sorted Alphabetically Descending',
-                  'Sorted Numerically Ascending',
-                  'Sorted Numerically Descending',
+                  "Sorted Alphabetically Ascending",
+                  "Sorted Alphabetically Descending",
+                  "Sorted Numerically Ascending",
+                  "Sorted Numerically Descending",
                 ]}
               />
             </div>
@@ -148,7 +148,11 @@ export default class IndexPage extends React.Component {
     await this.setState({ query: e.target.value });
     if (this.state.query.length > 2) {
       const response = await axios.get(
-        `http://localhost:3000/api/nimfinder/?keyword=${this.state.query}`
+        `${
+          process.env.NODE_ENV === "production"
+            ? process.env.prod_api
+            : process.env.dev_api
+        }api/nimfinder/?keyword=${this.state.query}`
       );
       this.setState({
         response: response.data.data,
@@ -164,7 +168,11 @@ export default class IndexPage extends React.Component {
 
   async onLoadMore(e) {
     const response = await axios.get(
-      `http://localhost:3000/api/nimfinder/?keyword=${this.state.query}&page=${(
+      `${
+        process.env.NODE_ENV === "production"
+          ? process.env.prod_api
+          : process.env.dev_api
+      }api/nimfinder/?keyword=${this.state.query}&page=${(
         parseInt(this.state.page) + 1
       ).toString()}`
     );
@@ -178,19 +186,29 @@ export default class IndexPage extends React.Component {
   }
 
   sortingFunctions = [
-    (x, y) => {return x.nama.localeCompare(y.nama)},
-    (x, y) => {return y.nama.localeCompare(x.nama)},
-    (x, y) => {return x.nim_fakultas.localeCompare(y.nim_fakultas)},
-    (x, y) => {return y.nim_fakultas.localeCompare(x.nim_fakultas)},
-  ]
+    (x, y) => {
+      return x.nama.localeCompare(y.nama);
+    },
+    (x, y) => {
+      return y.nama.localeCompare(x.nama);
+    },
+    (x, y) => {
+      return x.nim_fakultas.localeCompare(y.nim_fakultas);
+    },
+    (x, y) => {
+      return y.nim_fakultas.localeCompare(x.nim_fakultas);
+    },
+  ];
 
   async onSortByClicked() {
-    await this.setState({sortedBy: (this.state.sortedBy + 1) %4});
+    await this.setState({ sortedBy: (this.state.sortedBy + 1) % 4 });
     this.sortResponse();
   }
-  
+
   async sortResponse() {
-    const sortedResponse = [...this.state.response].sort(this.sortingFunctions[this.state.sortedBy]);
-    await this.setState({ response: sortedResponse});
+    const sortedResponse = [...this.state.response].sort(
+      this.sortingFunctions[this.state.sortedBy]
+    );
+    await this.setState({ response: sortedResponse });
   }
 }

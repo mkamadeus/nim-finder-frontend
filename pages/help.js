@@ -146,7 +146,11 @@ export default class HelpPage extends React.Component {
 
   async getFaculties() {
     this.facultyMap = await axios.get(
-      "http://localhost:3000/api/nimfinder/faculties"
+      `${
+        process.env.NODE_ENV === "production"
+          ? process.env.prod_api
+          : process.env.dev_api
+      }api/nimfinder/faculties`
     );
     this.facultyMap = this.facultyMap.data;
     this.setState({ facultiesLoaded: true });
@@ -154,7 +158,11 @@ export default class HelpPage extends React.Component {
 
   async getMajors() {
     this.majorMap = await axios.get(
-      "http://localhost:3000/api/nimfinder/majors"
+      `${
+        process.env.NODE_ENV === "production"
+          ? process.env.prod_api
+          : process.env.dev_api
+      }api/nimfinder/majors`
     );
     this.majorMap = this.majorMap.data;
     this.setState({ majorsLoaded: true });

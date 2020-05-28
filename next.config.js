@@ -1,11 +1,9 @@
 module.exports = 
 {
   exportTrailingSlash: true,
-  exportPathMap: async function(defaultPathMap, { dev, dir, outDir, distDir, buildId }) {
-    return {
-      '/': { page: '/' },
-      '/help': { page: '/help' }
-    };
-  },
+  env: {
+    'dev_api' : 'http://localhost:3000/',
+    'prod_api' : 'http://api.gatot.id/'
+  }
   // assetPrefix: './'
 }
