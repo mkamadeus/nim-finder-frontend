@@ -3,6 +3,7 @@ module.exports = {
   theme: {
     fontFamily: {
      'sans': ['Nunito', 'sans-serif'],
+     'mono': ['Inconsolata', 'monospace']
     }
   },
   variants: {

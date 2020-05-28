@@ -8,6 +8,7 @@ export default class HeadComponent extends React.Component {
     return (
       <Head>
         <title>Geprek NIM Finder</title>
+        <link rel="icon" href="/favicon.ico"></link>
         <meta name="title" content="Geprek NIM Finder" />
         <meta name="description" content="Geprek NIM Finder untuk mahasiswa-mahasiswa ITB disertai dengan beberapa kemampuan lainnya." />
         <meta name="keywords" content="geprek, nim, finder, nim finder, geprek nim" />

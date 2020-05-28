@@ -13,7 +13,7 @@ export default class SortByComponent extends Component {
     return (
       <div className="flex flex-row items-center -mx-2">
         <div
-          className="flex flex-row items-center justify-center rounded-full shadow mx-2 w-8 h-8 hover:shadow-md focus:outline-none transition duration-150"
+          className="flex flex-row items-center justify-center rounded-full shadow mx-2 p-2 w-8 h-8 hover:shadow-md focus:outline-none transition duration-150"
           onClick={() => {
             this.setState({
               ascending: (this.state.ascending + 1) % 4,
@@ -25,7 +25,7 @@ export default class SortByComponent extends Component {
           <FontAwesomeIcon
             icon={this.props.icons[this.state.ascending]}
             className="text-blue-800"
-            style={{ fontSize: "20px" }}
+            style={{ fontSize: "15px" }}
           />
         </div>
         <div className="text-xs invisible md:visible mx-2 w-32 italic text-gray-500">
