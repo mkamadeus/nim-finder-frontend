@@ -63,7 +63,8 @@ export default class IndexPage extends React.Component {
     const showLoadMore = () => {
       if (
         this.state.query.length <= 2 ||
-        this.state.currentCount >= this.state.responseCount
+        this.state.currentCount >= this.state.responseCount ||
+        this.state.response.length === 0
       ) {
         return null;
       } else {
