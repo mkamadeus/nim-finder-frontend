@@ -18,7 +18,6 @@ export default class SortByComponent extends Component {
             this.setState({
               ascending: (this.state.ascending + 1) % 4,
             });
-            this.props.sortResponse();
           }}
           style={{ background: "#fff" }}
         >
@@ -28,11 +27,10 @@ export default class SortByComponent extends Component {
             style={{ fontSize: "15px" }}
           />
         </div>
-        <div className="text-xs invisible md:visible mx-2 w-32 italic text-gray-500">
+        <div className="text-xs mx-2 w-32 italic text-gray-500">
           {this.props.sortedBy[this.state.ascending]}
         </div>
       </div>
-
     );
   }
 }
