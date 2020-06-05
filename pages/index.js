@@ -21,7 +21,8 @@ export default class IndexPage extends React.Component {
     this.state = {
       geprekIndex: Math.floor(Math.random() * this.geprek.length),
       query: "",
-      sortedBy: 0,
+      order: "nama",
+      ascending: "true",
       page: 0,
       currentCount: 0,
       responseCount: 0,
@@ -40,7 +41,7 @@ export default class IndexPage extends React.Component {
     window.removeEventListener("scroll", this.scrollListener);
   }
 
-  scrollListener = () => {
+  scrollListener = async () => {
     const windowScroll =
       document.body.scrollTop || document.documentElement.scrollTop;
     const height =
@@ -48,13 +49,19 @@ export default class IndexPage extends React.Component {
       document.documentElement.clientHeight;
     const scrolled = windowScroll / height;
     if (scrolled === 1) {
-      this.onLoadMore();
+      await this.fetchStudentData(this.state.page + 1);
     }
   };
 
   componentDidUpdate(prevProps, prevState) {
     if (this.state.query.length <= 2 && this.state.loading) {
       this.setState({ loading: false });
+    }
+    if (
+      prevState.order !== this.state.order ||
+      prevState.ascending !== this.state.ascending
+    ) {
+      this.fetchStudentData(0);
     }
     if (prevState.query !== this.state.query) {
       this.queryDelay();
@@ -64,25 +71,52 @@ export default class IndexPage extends React.Component {
   async queryDelay() {
     clearTimeout(this.inputTimer);
     await this.setState({ loading: true });
-    this.inputTimer = setTimeout(async () => {
-      if (this.state.query.length > 2) {
-        const response = await axios.get(
-          `${
-            process.env.NODE_ENV === "production"
-              ? process.env.prod_api
-              : process.env.dev_api
-          }api/nimfinder/?keyword=${this.state.query}`
-        );
-        await this.setState({ loading: false });
+    console.log(this.state);
+    this.inputTimer = setTimeout(this.fetchStudentData.bind(this), 350);
+  }
+
+  async fetchStudentData(page) {
+    if (this.state.query.length > 2) {
+      page = page || 0;
+      this.setState({ loading: true });
+      const response = await axios.get(
+        `${
+          process.env.NODE_ENV === "production"
+            ? process.env.prod_api
+            : process.env.dev_api
+        }api/nimfinder/?keyword=${this.state.query}&order=${
+          this.state.order
+        }&asc=${this.state.ascending}&page=${page || 0}`
+      );
+      if (page === 0) {
         this.setState({
+          loading: false,
           response: response.data.data,
+          page: page,
           responseCount: response.data.count,
           currentCount: response.data.data.length,
         });
       } else {
-        this.setState({ response: [], responseCount: 0, currentCount: 0 });
+        this.setState({
+          loading: false,
+          response: this.state.response.concat(response.data.data),
+          page: page,
+          currentCount: this.state.currentCount + response.data.data.length,
+        });
       }
-    }, 350);
+    } else {
+      await this.setState({
+        response: [],
+        loading: false,
+        page: 0,
+        responseCount: 0,
+        currentCount: 0,
+      });
+    }
+  }
+
+  async queryHandler(e) {
+    await this.setState({ query: e.target.value });
   }
 
   render() {
@@ -90,7 +124,7 @@ export default class IndexPage extends React.Component {
       if (this.state.loading) {
         return `Loading...`;
       } else if (this.state.response.length !== 0) {
-        return `Menunjukan ${this.state.response.length} dari ${this.state.responseCount} hasil.`;
+        return `Menunjukkan ${this.state.response.length} dari ${this.state.responseCount} hasil.`;
       } else if (this.state.query.length <= 2) {
         return `Hasil pencarian akan muncul di sini.`;
       } else {
@@ -119,7 +153,7 @@ export default class IndexPage extends React.Component {
     };
 
     return (
-      <div className="">
+      <>
         <HeadComponent />
         <div className="container mx-auto p-6">
           <div className="flex flex-col md:items-center px-3 mt-3">
@@ -141,18 +175,17 @@ export default class IndexPage extends React.Component {
             </h2>
           </div>
           <div
-            className="sticky pt-5 pb-3"
+            className="flex flex-col items-center justify-center sticky top-0 pt-5 pb-2"
             style={{
-              top: "0px",
               background:
                 "linear-gradient(180deg, rgba(255,255,255,1) 52%, rgba(255,255,255,0.8) 74%, rgba(255,255,255,0.7) 83%, rgba(255,255,255,0.2) 99%)",
             }}
           >
-            <div className="flex w-full mb-3">
+            <div className="w-full md:w-2/3 mb-3">
               <input
                 type="text"
                 placeholder="Masukkan kata pencarian..."
-                className="rounded-full bg-gray-200 w-full p-2 px-4 border-2 border-transparent text-blue-800 font-semibold focus:text-black focus:border-solid focus:bg-white focus:border-blue-300 focus:shadow md:focus:shadow-md lg:focus:shadow-lg transition duration-300 ease-out focus:outline-none"
+                className="rounded-full bg-gray-200 w-full p-2 px-4 border-2 border-transparent text-blue-800 font-semibold focus:text-black focus:border-solid focus:bg-white focus:border-blue-300 focus:shadow md:focus:shadow-md transition duration-300 ease-out focus:outline-none"
                 onInput={this.queryHandler.bind(this)}
               />
             </div>
@@ -161,36 +194,35 @@ export default class IndexPage extends React.Component {
             </div>
           </div>
           <div className="flex items-center justify-center">
-            <div className="py-2 w-full md:w-2/3">{studentList()}</div>
+            <div className="py-2 pb-6 w-full md:w-2/3">{studentList()}</div>
           </div>
         </div>
-      </div>
+        <div className="flex flex-row fixed w-full p-6 bottom-0 left-0 -mx-2">
+          <div className="px-2">
+            <SortByComponent
+              icon={
+                require("@fortawesome/free-solid-svg-icons/faFilter").faFilter
+              }
+              selection={[
+                ["Nama", "nama"],
+                ["NIM Fakultas", "nim_fakultas"],
+                ["NIM Jurusan", "nim_jurusan"],
+              ]}
+              onSelect={(value) => this.setState({ order: value })}
+            />
+          </div>
+          <div className="px-2">
+            <SortByComponent
+              icon={require("@fortawesome/free-solid-svg-icons/faSort").faSort}
+              selection={[
+                ["Ascending", true],
+                ["Descending", false],
+              ]}
+              onSelect={(value) => this.setState({ ascending: value })}
+            />
+          </div>
+        </div>
+      </>
     );
-  }
-
-  async queryHandler(e) {
-    await this.setState({ query: e.target.value });
-    this.setState({ page: 0 });
-  }
-
-  async onLoadMore(e) {
-    if (this.state.currentCount < this.state.responseCount) {
-      await this.setState({ loading: true });
-      const response = await axios.get(
-        `${
-          process.env.NODE_ENV === "production"
-            ? process.env.prod_api
-            : process.env.dev_api
-        }api/nimfinder/?keyword=${this.state.query}&page=${(
-          parseInt(this.state.page) + 1
-        ).toString()}`
-      );
-      await this.setState({ loading: false });
-      this.setState({
-        response: this.state.response.concat(response.data.data),
-        page: response.data.page,
-        currentCount: this.state.currentCount + response.data.data.length,
-      });
-    }
   }
 }
