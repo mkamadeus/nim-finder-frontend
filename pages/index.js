@@ -1,11 +1,11 @@
+import React from "react";
+import axios from "axios";
 import Link from "next/link";
 import StudentComponent from "../components/StudentComponent.js";
 import HelpOutlineOutlinedIcon from "@material-ui/icons/HelpOutlineOutlined";
 import HeadComponent from "../components/HeadComponent.js";
-import LoadMoreComponent from "../components/LoadMoreComponent.js";
-import React from "react";
-import axios from "axios";
 import SortByComponent from "../components/SortByComponent.js";
+import debounce from "lodash.debounce";
 
 export default class IndexPage extends React.Component {
   constructor(props) {
@@ -17,9 +17,12 @@ export default class IndexPage extends React.Component {
       "Krisbar Gemesnya",
       "Ayam Geprek Bakso",
     ];
+    this.geprekIndex = 0;
+    this.locked = false;
+    this.inputTimer = null;
 
     this.state = {
-      geprekIndex: Math.floor(Math.random() * this.geprek.length),
+      geprekIndex: 0,
       query: "",
       order: "nama",
       ascending: "true",
@@ -29,26 +32,28 @@ export default class IndexPage extends React.Component {
       response: [],
       loading: false,
     };
-
-    this.inputTimer = null;
   }
 
   componentDidMount() {
-    window.addEventListener("scroll", this.scrollListener);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener("scroll", this.scrollListener);
+    this.setState({
+      geprekIndex: Math.floor(Math.random() * this.geprek.length),
+    });
+    window.onscroll = debounce(this.scrollListener.bind(this), 100);
   }
 
   scrollListener = async () => {
-    const windowScroll =
-      document.body.scrollTop || document.documentElement.scrollTop;
-    const height =
-      document.documentElement.scrollHeight -
-      document.documentElement.clientHeight;
-    const scrolled = windowScroll / height;
-    if (scrolled === 1) {
+    if (
+      this.state.loading ||
+      this.state.currentCount >= this.state.responseCount
+    )
+      return;
+    if (
+      Math.abs(
+        window.innerHeight +
+          document.documentElement.scrollTop -
+          document.documentElement.offsetHeight
+      ) <= 20
+    ) {
       await this.fetchStudentData(this.state.page + 1);
     }
   };
@@ -61,17 +66,18 @@ export default class IndexPage extends React.Component {
       prevState.order !== this.state.order ||
       prevState.ascending !== this.state.ascending
     ) {
+      window.scrollTo(0, 0);
       this.fetchStudentData(0);
     }
     if (prevState.query !== this.state.query) {
+      window.scrollTo(0, 0);
       this.queryDelay();
     }
   }
 
-  async queryDelay() {
+  queryDelay() {
     clearTimeout(this.inputTimer);
-    await this.setState({ loading: true });
-    console.log(this.state);
+    this.setState({ loading: true });
     this.inputTimer = setTimeout(this.fetchStudentData.bind(this), 350);
   }
 
@@ -91,16 +97,16 @@ export default class IndexPage extends React.Component {
       if (page === 0) {
         this.setState({
           loading: false,
-          response: response.data.data,
           page: page,
+          response: response.data.data,
           responseCount: response.data.count,
           currentCount: response.data.data.length,
         });
       } else {
         this.setState({
           loading: false,
-          response: this.state.response.concat(response.data.data),
           page: page,
+          response: this.state.response.concat(response.data.data),
           currentCount: this.state.currentCount + response.data.data.length,
         });
       }
@@ -115,8 +121,8 @@ export default class IndexPage extends React.Component {
     }
   }
 
-  async queryHandler(e) {
-    await this.setState({ query: e.target.value });
+  queryHandler(e) {
+    this.setState({ query: e.target.value });
   }
 
   render() {

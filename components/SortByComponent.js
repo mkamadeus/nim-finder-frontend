@@ -20,16 +20,22 @@ export default onClickOutside(
       return (
         <div className="flex flex-row items-center -mx-2 relative">
           <div
-            className="flex flex-row items-center justify-center rounded-full shadow mx-2 p-2 w-8 h-8 hover:shadow-md focus:outline-none transition duration-150"
+            className="flex flex-row items-center justify-center rounded-full shadow mx-2 h-8 w-8 hover:shadow-md focus:outline-none"
+            // style={{ width: "50px", height: "50px" }}
             onClick={() => {
               this.setState({ showMenu: !this.state.showMenu });
             }}
             style={{ background: "#fff" }}
           >
             <FontAwesomeIcon
+              // preserveAspectRatio="xMidyMid meet"
+              // viewBox="0 0 50 50"
               icon={this.props.icon}
               className="text-blue-800"
-              style={{ fontSize: "15px" }}
+              // size="1x"
+              width="15"
+              height="15"
+              // style={{ fontSize: "8px" }}
             />
           </div>
           {this.state.showMenu ? (

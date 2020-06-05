@@ -6,6 +6,7 @@
     "dev": "next dev -p 8080",
     "build": "next build",
     "export": "next export",
+    "static": "next build && next export",
     "start": "next start"
   },
   "dependencies": {
@@ -18,6 +19,7 @@
     "autoprefixer": "^9.7.6",
     "axios": "^0.19.2",
     "gapi-script": "^1.0.2",
+    "lodash.debounce": "^4.0.8",
     "next": "9.3.6",
     "postcss-import": "^12.0.1",
     "postcss-preset-env": "^6.7.0",
